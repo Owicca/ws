@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  ws_front:
+    image: centos/nodejs-8-centos7:latest
+    container_name: ws_front
+    working_dir: /app/src/
+    command: npm run dev:watch
+    volumes:
+      - ./front/:/app/
+    user: "1000:0"
+    networks:
+      - ws_n
+  ws_ng:
+    image: nginx:latest
+    container_name: ws_ng
+    ports:
+      - "9003:80"
+    networks:
+      - ws_n
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/fastcgi_params:/etc/nginx/fastcgi_params
+      - ./config/passwd:/etc/nginx/passwd
+      - ./config/conf.d/:/etc/nginx/conf.d/
+      - ./log/:/var/log/nginx/
+      - ./front/public/:/usr/share/nginx/html/
+
+  ws_back:
+    image: golang:latest
+    container_name: ws_back
+    volumes:
+      - ./back:/app/
+    working_dir: /app/
+    ports:
+      - "9000:9000"
+    networks:
+      - ws_n
+    command: "go run main.go"
+
+networks:
+  ws_n:
+    name: "ws_n"

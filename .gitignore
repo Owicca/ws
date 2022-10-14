@@ -1,0 +1,9 @@
+/log/*
+!/log/.gitkeep
+
+node_modules
+
+/front/public/*
+
+*.ico
+*.png
